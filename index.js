@@ -61,16 +61,10 @@ app.post('/add_employee', async (req, res) => {
         });
     console.log(err);
 });
-
-
-
-
-
 //Send a JSON object with the new employee data and update the corresponding data
 app.post('/update_employee', async (req, res) => {
 
 })
-
 //Send a JSON object with products
 app.post('/make_sale', async (req, res) => {
     var data = req.body;
@@ -113,7 +107,18 @@ app.post('/create_clockin', async (req, res) => {
 });
 
 
+app.get("/get_inventory", async (req, res) => {
+    console.log("Call received!");
+    try {
+        var result = await pool.query("SELECT * FROM PRODUCT;");
+        console.log(result.rows);
+        res.json(result.rows);
+    } catch (err) {
+        console.log(err);
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
-})
+});
