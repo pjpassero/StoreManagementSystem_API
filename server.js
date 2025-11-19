@@ -7,6 +7,10 @@ const app = express();
 const port = 3000;
 app.use(express.json());
 
+app.get("/", (req, res) => {
+    res.send("Hello World");
+});
+
 
 //Create a product. Adds the product to the database
 app.post('/create_product', (req, res) => {
@@ -17,8 +21,8 @@ app.post('/create_product', (req, res) => {
             if (result.rows.length === 0) {
                 console.log("UPC Unique!");
                 try {
-                    var query = `INSERT INTO PRODUCT (productsku, productname, productcost, productprice, productupc, productdescription) VALUES ($1, $2, $3, $4, $5, $6)`;
-                    var values = [data.productsku, data.productname, data.productcost, data.productprice, data.productupc, data.productdescription];
+                    var query = `INSERT INTO PRODUCT (productsku, productname, productcost, productprice, productupc, productdescription, inventorycount, itemstatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
+                    var values = [data.productsku, data.productname, data.productcost, data.productprice, data.productupc, data.productdescription, data.productinventory, data.productstatus];
                     pool.query(query, values);
                     res.send("Product Added Successfully!");
 
@@ -71,7 +75,7 @@ app.post('/make_sale', async (req, res) => {
     var timestamp = data.timestamp;
     var products = data.products;
     var saleAmount = data.total;
-    var method = data.method;
+    var method = data.method; //paymentMethod
     var saleId = data.id;
 
 
@@ -102,8 +106,6 @@ app.post('/make_sale', async (req, res) => {
 })
 
 app.post('/create_clockin', async (req, res) => {
-
-
 });
 
 
@@ -112,10 +114,81 @@ app.get("/get_inventory", async (req, res) => {
     try {
         var result = await pool.query("SELECT * FROM PRODUCT;");
         console.log(result.rows);
-        res.json(result.rows);
+        if (result.rows.length == 0) {
+            res.send("No Data in Database!");
+        } else {
+            res.json(result.rows);
+        }
     } catch (err) {
         console.log(err);
     }
+});
+
+app.get("/get_new_sku", async (req, res) => {
+    console.log("SKU REQUEST");
+    try {
+        const result = await pool.query(
+            "SELECT currentsku FROM SKU_COUNTER WHERE entryId = 1;"
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: "SKU not found" });
+        }
+        let currentSku = result.rows[0].currentsku;
+        const newSku = currentSku + 1;
+        await pool.query(
+            "UPDATE SKU_COUNTER SET currentsku = $1 WHERE entryId = 1;",
+            [newSku]
+        );
+
+        res.send(currentSku);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Database error" });
+    }
+});
+
+
+app.get("/get_sales_data", async (req, res) => {
+    console.log("Sales data requested");
+    try {
+        const result = await pool.query("SELECT * FROM sale;");
+        console.log(result.rows);
+        if (result.rows.length == 0) {
+            res.send("No Data in Database!");
+        } else {
+            res.json(result.rows);
+        }
+    } catch (err) {
+
+    }
+
+
+
+
+});
+
+
+app.post("/login", async (req, res) => {
+
+    console.log(req.body);
+    var employeeusername = req.body.employeeusername;
+    var employeepin = req.body.employeepin;
+
+    try {
+
+        pool.query("SELECT * FROM employee WHERE employeeusername=$1 AND employeepin=$2", [employeeusername, employeepin,]).then(result => {
+            if (result.rows.length == 0) {
+                res.send("Error");
+            } else {
+                res.send(result.rows);
+            }
+        });
+
+    } catch (err) {
+        console.log(err);
+    }
+
+
 });
 
 
