@@ -149,9 +149,47 @@ app.get("/get_new_sku", async (req, res) => {
 
 
 app.get("/get_sales_data", async (req, res) => {
+    console.log("Sales data requested");
+    try {
+        const result = await pool.query("SELECT * FROM sale;");
+        console.log(result.rows);
+        if (result.rows.length == 0) {
+            res.send("No Data in Database!");
+        } else {
+            res.json(result.rows);
+        }
+    } catch (err) {
+
+    }
+
+
+
 
 });
 
+
+app.post("/login", async (req, res) => {
+
+    console.log(req.body);
+    var employeeusername = req.body.employeeusername;
+    var employeepin = req.body.employeepin;
+
+    try {
+
+        pool.query("SELECT * FROM employee WHERE employeeusername=$1 AND employeepin=$2", [employeeusername, employeepin,]).then(result => {
+            if (result.rows.length == 0) {
+                res.send("Error");
+            } else {
+                res.send(result.rows);
+            }
+        });
+
+    } catch (err) {
+        console.log(err);
+    }
+
+
+});
 
 
 app.listen(port, () => {
