@@ -82,7 +82,7 @@ app.post('/add_employee', async (req, res) => {
 
 
     pool.query(
-        "INSERT INTO employee (employeeName, employeeUsername, employeePin, employeeLevel) VALUES ($1,$2,$3,$4,$5)",
+        "INSERT INTO employee (employeeName, employeeUsername, employeePin, employeeLevel) VALUES ($1,$2,$3,$4)",
         [employeeName, employeeUsername, employeePin, employeeLevel]
     )
         .then(result => {
@@ -94,7 +94,6 @@ app.post('/add_employee', async (req, res) => {
             res.send(err);
 
         });
-    console.log(err);
 });
 //Send a JSON object with the new employee data and update the corresponding data
 app.post('/update_employee', async (req, res) => {
