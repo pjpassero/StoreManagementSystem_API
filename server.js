@@ -9,7 +9,7 @@ const port = 3000;
 app.use(express.json());
 
 app.get("/", (req, res) => {
-    res.send("Hello World");
+    res.send("Hello World, sever running");
 });
 
 
@@ -198,6 +198,7 @@ app.post("/search_inventory", async (req, res) => {
         });
     } catch (err) {
         console.log(err);
+        res.send("There has been a server error:  " + err);
     }
 
 });
@@ -249,23 +250,53 @@ app.post('/make_sale', async (req, res) => {
     }
 });
 
+
+//create the clockin in the database
 app.post('/create_clockin', async (req, res) => {
 
     var data = req.body;
+    var type = data["type"];
     console.log(req.body);
 
-    try {
-        var query = "INSERT INTO clock_in VALUES("
 
-    } catch (err) {
-        console.log(err);
+    if (type == "in") {
+        try {
+
+            var query = "INSERT INTO clock_in (sessionid, employeeid, clockedintime, clockedouttime) VALUES ($1,$2, $3, $4);";
+            var values = [data.sessionId, data.userId, data.timeIn, null];
+
+            pool.query(query, values).then(result => {
+                console.log("Insert successful");
+                res.send("success");
+            });
+
+
+        } catch (err) {
+            console.log(err);
+            res.send("error");
+        }
+    } else {
+        try {
+
+            var query = "UPDATE clock_in SET clockedouttime = $1 WHERE sessionid = $2;";
+            var values = [data.timeOut, data.sessionId];
+            pool.query(query, values).then(result => {
+                console.log("Update successful");
+            });
+
+
+        } catch (err) {
+            console.log(err);
+        }
     }
+
+
 
 
 
 });
 
-
+//gets the entire inventory and sends it to the client
 app.get("/get_inventory", async (req, res) => {
     console.log("Call received!");
     try {
@@ -281,6 +312,8 @@ app.get("/get_inventory", async (req, res) => {
     }
 });
 
+
+//gets a new sku for the client
 app.get("/get_new_sku", async (req, res) => {
     try {
         const result = await pool.query(
