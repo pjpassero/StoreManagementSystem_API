@@ -446,3 +446,23 @@ app.post('/add_shift', async (req, res) => {
         res.status(500).send(err);
     });
 });
+
+//Get all schedules with employee names
+app.get('/get_all_schedules', async (req, res) => {
+    pool.query(
+        `SELECT s.scheduleid, 
+                s.shiftdate, 
+                s.starttime, 
+                s.endtime, 
+                e.employeeid, 
+                e.employeename
+         FROM schedule s
+         JOIN employee e ON e.employeeid = s.employeeid
+         ORDER BY s.shiftdate, s.starttime`,
+    )
+    .then(result => res.json(result.rows))
+    .catch(err => {
+        console.error(err);
+        res.status(500).send(err);
+    });
+});
