@@ -465,4 +465,19 @@ app.get('/get_all_schedules', async (req, res) => {
         console.error(err);
         res.status(500).send(err);
     });
+
+    //Delete a shift by id
+app.get('/delete_shift/:id', async (req, res) => {
+    const shiftId = req.params.id;
+
+    pool.query("DELETE FROM schedule WHERE scheduleid = $1", [shiftId])
+    .then(result => {
+        res.send("Shift deleted successfully!");
+    })
+    .catch(err => {
+        console.error("Error deleting shift:", err);
+        res.send("error");
+     });
+    });
+
 });
