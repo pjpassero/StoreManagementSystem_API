@@ -415,11 +415,6 @@ app.post("/login", async (req, res) => {
 });
 
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-});
-
-
 //Get schedule for an employee
 app.get('/get_schedule/:employeeID', async (req, res) => {
     const employeeID = req.params.employeeID;
