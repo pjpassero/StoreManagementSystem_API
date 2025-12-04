@@ -76,7 +76,7 @@ app.post('/update_product', (req, res) => {
 //TEMP DELETE ALL PRODUCTS
 app.get('/wipe_products', async (req, res) => {
     try {
-        await pool.query("DELETE FROM product;");
+        await pool.query("DELETE FROM PRODUCT;");
         res.send("All products deleted.");
     } catch (err) {
         console.log("Error deleting products: " + err);

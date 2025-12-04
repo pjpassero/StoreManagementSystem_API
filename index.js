@@ -1,12 +1,33 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import pool from './db/pool.js';
-
+import cors from 'cors';
 
 const app = express();
 const port = 3000;
+
 app.use(express.json());
 
+
+const allowedOrigins = [
+    "http://localhost:3000",                
+    "https://sms-web-client.onrender.com",   
+];
+
+// CORS 
+app.use(cors({
+    origin: function(origin, callback) {
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        } else {
+            return callback(new Error("CORS blocked for origin: " + origin));
+        }
+    },
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"]
+}));
 app.get("/", (req, res) => {
     res.send("Hello World");
 });
