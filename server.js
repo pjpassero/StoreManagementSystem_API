@@ -2,11 +2,24 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import pool from './db/pool.js';
+import cors from 'cors';
 
 
 const app = express();
 const port = 3000;
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://sms-web-client.onrender.com"
+    ],
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
 app.use(express.json());
+
 
 app.get("/", (req, res) => {
     res.send("Hello World, sever running");
