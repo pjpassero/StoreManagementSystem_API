@@ -6,8 +6,6 @@ import cors from 'cors';
 const app = express();
 const port = 3000;
 
-app.use(express.json());
-
 
 const allowedOrigins = [
     "http://localhost:3000",                
@@ -32,6 +30,7 @@ app.get("/", (req, res) => {
     res.send("Hello World");
 });
 
+app.use(express.json());
 
 //Create a product. Adds the product to the database
 app.post('/create_product', (req, res) => {
